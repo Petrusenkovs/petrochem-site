@@ -4,6 +4,8 @@ import { getImageUrl } from '@/lib/utils';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Tag } from 'lucide-react';
+// 1. Импортируем парсер
+import parse from 'html-react-parser';
 
 interface Article {
   title: string;
@@ -31,18 +33,28 @@ async function getPost(slug: string) {
   }
 }
 
-// ⚠️ ИЗМЕНЕНИЕ: Тип params теперь Promise
+// 2. Вспомогательная функция для декодирования HTML-сущностей
+// Если в базе лежит "&lt;h1&gt;", она превратит это в "<h1>", чтобы парсер понял, что это тег.
+function decodeHtml(html: string) {
+  return html
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&amp;/g, '&');
+}
+
 export default async function SingleNewsPage({ params }: { params: Promise<{ slug: string }> }) {
-  
-  // ⚠️ ИЗМЕНЕНИЕ: Сначала ждем разрешения промиса
   const { slug } = await params;
-  
-  // Теперь используем уже полученный slug
   const post = await getPost(slug);
 
   if (!post) {
     notFound();
   }
+
+  // 3. Подготавливаем контент перед рендером
+  // Если контент пришел пустым, ставим пустую строку
+  const cleanContent = post.content ? decodeHtml(post.content) : '';
 
   return (
     <main className="min-h-screen py-12 px-4 flex justify-center">
@@ -89,12 +101,20 @@ export default async function SingleNewsPage({ params }: { params: Promise<{ slu
         )}
 
         <div className="p-8 md:p-12">
+          {/* Здесь магия:
+             1. className="prose..." задает стили (отступы, шрифты, цвета).
+             2. parse(cleanContent) превращает строку HTML в реальные элементы.
+             
+             Ссылки <a href="..."> будут работать автоматически и покрасятся в цвет sky-400 
+             благодаря твоему классу prose-a:text-sky-400.
+          */}
           <div 
             className="prose prose-lg prose-invert max-w-none 
             prose-headings:text-white prose-p:text-slate-300 prose-a:text-sky-400 
             prose-strong:text-white prose-li:text-slate-300"
-            dangerouslySetInnerHTML={{ __html: post.content }} 
-          />
+          >
+            {parse(cleanContent)}
+          </div>
         </div>
 
       </div>
