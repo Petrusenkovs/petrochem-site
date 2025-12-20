@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const navItems = [
   { href: '/', label: 'Главная', icon: Home },
   { href: '/news', label: 'Новости', icon: FileText },
-  { href: '/network', label: 'Нейросеть', icon: Share2 }, // <-- НОВЫЙ ПУНКТ
+  { href: '/network', label: 'Некусус', icon: Share2 }, // <-- НОВЫЙ ПУНКТ
   { href: '/dashboard', label: 'Кабинет', icon: LayoutDashboard },
 ];
 
