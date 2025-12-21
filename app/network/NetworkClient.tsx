@@ -8,28 +8,19 @@ export default function NetworkClient({ data }: { data: any }) {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
   const handleNodeClick = (id: string | null) => {
-    if (selectedNode === id) {
-      setSelectedNode(null);
-    } else {
-      setSelectedNode(id);
-    }
+    setSelectedNode(prev => prev === id ? null : id);
   };
 
   return (
-    // ГЛАВНЫЙ КОНТЕЙНЕР: Занимает весь экран (100vh)
-    // Mobile: flex-col (вертикальный стек)
-    // Desktop: flex-row (горизонтальный ряд)
-    <div className="flex flex-col lg:flex-row h-screen w-screen bg-slate-950 overflow-hidden">
+    // Используем 100dvh для корректной работы на iPhone/Android
+    <div className="flex flex-col lg:flex-row h-[100dvh] w-screen bg-slate-950 overflow-hidden">
       
-      {/* 1. БЛОК ГРАФА 
-          Он всегда есть. Но меняет размер.
-      */}
+      {/* 1. ГРАФ (СВЕРХУ на моб / СЛЕВА на ПК) */}
       <div className={`
-          relative transition-all duration-500 ease-in-out w-full
-          /* МОБИЛЬНЫЙ РЕЖИМ (по умолчанию): */
-          ${selectedNode ? 'h-[35vh]' : 'h-full'} 
-          
-          /* ДЕСКТОП РЕЖИМ (lg): */
+          relative transition-all duration-300 ease-in-out w-full
+          /* Mobile: Если открыто - 35% высоты, если нет - 100% */
+          ${selectedNode ? 'h-[35%]' : 'h-full'} 
+          /* Desktop: Всегда полная высота, гибкая ширина */
           lg:h-full lg:flex-1
       `}>
         <KnowledgeGraph 
@@ -39,49 +30,28 @@ export default function NetworkClient({ data }: { data: any }) {
         />
       </div>
 
-      {/* 2. БЛОК САЙДБАРА
-          Он открывается снизу на телефоне и справа на ПК.
-      */}
+      {/* 2. САЙДБАР (СНИЗУ на моб / СПРАВА на ПК) */}
       <div className={`
-          bg-slate-900 border-slate-800 z-20 shadow-2xl overflow-hidden flex flex-col
-          transition-all duration-500 ease-in-out
+          bg-slate-900 border-t border-slate-800 lg:border-t-0 lg:border-l z-20 shadow-2xl
+          flex flex-col transition-all duration-300 ease-in-out
           
-          /* ГРАНИЦЫ */
-          border-t lg:border-t-0 lg:border-l
-
-          /* РАЗМЕРЫ НА МОБИЛЬНОМ (изменяем высоту h) */
+          /* Mobile: Высота меняется с 0 до 65% */
           w-full
-          ${selectedNode ? 'h-[65vh]' : 'h-0'}
+          ${selectedNode ? 'h-[65%]' : 'h-0'}
 
-          /* РАЗМЕРЫ НА ДЕСКТОПЕ (изменяем ширину w, высота всегда full) */
+          /* Desktop: Высота всегда 100%, ширина меняется */
           lg:h-full 
-          lg:w-auto /* сброс мобильной ширины */
-          ${selectedNode ? 'lg:w-[480px]' : 'lg:w-0'}
+          lg:w-auto
+          ${selectedNode ? 'lg:w-[450px]' : 'lg:w-0'}
       `}>
         
-        {/* Внутренний контейнер для скролла */}
-        <div className="h-full w-full overflow-y-auto relative bg-slate-900">
-            
-            {/* Кнопка закрытия для мобилок (чтобы было удобно закрыть пальцем) */}
-            <button 
-                onClick={() => setSelectedNode(null)}
-                className="lg:hidden absolute top-4 right-4 z-50 p-2 bg-slate-800 rounded-full text-slate-300 hover:text-white"
-            >
-                ✕
-            </button>
-
-            {/* Контент с задержкой появления (чтобы не мелькал при открытии) */}
-            <div className={`
-                h-full w-full
-                transition-opacity duration-300 delay-100
-                ${selectedNode ? 'opacity-100' : 'opacity-0'}
-            `}>
-                <NetworkSidebar 
-                    nodeId={selectedNode} 
-                    // @ts-ignore
-                    onClose={() => setSelectedNode(null)} 
-                />
-            </div>
+        {/* Обертка нужна для корректной работы скрытия контента при анимации */}
+        <div className={`w-full h-full overflow-hidden ${selectedNode ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
+             <NetworkSidebar 
+                nodeId={selectedNode} 
+                // @ts-ignore
+                onClose={() => setSelectedNode(null)} 
+            />
         </div>
       </div>
 

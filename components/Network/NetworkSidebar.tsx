@@ -47,78 +47,91 @@ export default function NetworkSidebar({ nodeId, onClose }: NetworkSidebarProps)
   }, [nodeId]);
 
   return (
-    // ВАЖНОЕ ИЗМЕНЕНИЕ:
-    // Мы убрали 'fixed', 'top-0', 'right-0', 'w-[400px]'
-    // Теперь этот блок просто заполняет родительский контейнер (который мы настроили в NetworkClient)
-    <div className="w-full h-full flex flex-col bg-slate-900 border-l border-slate-800">
+    // min-h-0 критически важен для вложенного скролла во Flexbox!
+    <div className="w-full h-full flex flex-col bg-slate-900 min-h-0">
       
-      {/* ШАПКА: Прижата к верху (sticky) */}
-      <div className="h-16 px-4 py-2 border-b border-slate-800 flex justify-between items-center bg-slate-900 shrink-0 sticky top-0 z-10">
-        <div className="overflow-hidden">
-            <div className="text-[10px] text-sky-500 font-bold uppercase tracking-widest mb-0.5">
-                Выбрано
+      {/* --- ШАПКА (Компактная) --- */}
+      {/* h-12 на мобильных (очень узкая), h-16 на ПК */}
+      <div className="h-12 lg:h-16 px-4 flex justify-between items-center bg-slate-900 border-b border-slate-800 shrink-0 sticky top-0 z-10">
+        <div className="overflow-hidden flex-1 mr-2">
+            <div className="text-[9px] lg:text-[10px] text-sky-500 font-bold uppercase tracking-widest leading-none mb-1">
+                Тема
             </div>
-            <h2 className="text-xl font-bold text-white leading-tight truncate max-w-[200px] lg:max-w-[300px]">
+            {/* Текст уменьшается на мобильных (text-base), растет на ПК (text-xl) */}
+            <h2 className="text-base lg:text-xl font-bold text-white leading-none truncate">
               {nodeId}
             </h2>
         </div>
         
-        {/* Кнопку закрытия оставляем только для десктопа, на мобилке она есть у родителя. 
-            Но можно оставить и тут, вреда не будет. */}
         <button 
           onClick={onClose}
-          className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-all"
+          className="p-1.5 lg:p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-all bg-slate-800/50"
         >
-          <X size={20} />
+          <X size={18} className="lg:w-6 lg:h-6" />
         </button>
       </div>
 
-      {/* КОНТЕНТ: Занимает всё оставшееся место и скроллится */}
-      <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+      {/* --- СПИСОК (Скроллируемый) --- */}
+      {/* flex-1 позволяет занять всё оставшееся место. min-h-0 разрешает сжатие. */}
+      <div className="flex-1 overflow-y-auto min-h-0 p-3 lg:p-5 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
         
         {loading ? (
-           <div className="flex flex-col items-center justify-center h-full text-sky-500 gap-3">
-               <Loader2 className="animate-spin" size={32} />
-               <p className="text-xs text-slate-400 animate-pulse">Поиск...</p>
+           <div className="flex flex-col items-center justify-center h-full gap-3 opacity-70">
+               <Loader2 className="animate-spin" size={24} />
+               <p className="text-[10px] uppercase tracking-widest text-slate-500">Поиск...</p>
            </div>
         ) : (
            <>
-              <div className="mb-4">
-                <p className="text-slate-500 text-xs">
-                  Найдено: <span className="text-slate-300 font-bold">{articles.length}</span>
+              {/* Счетчик */}
+              <div className="mb-3 lg:mb-4 px-1">
+                <p className="text-slate-500 text-[10px] lg:text-xs">
+                  Найдено материалов: <span className="text-slate-300 font-bold">{articles.length}</span>
                 </p>
               </div>
 
-              <div className="space-y-3 pb-8">
+              {/* Карточки статей */}
+              <div className="space-y-3 pb-6">
                 {articles.map((article) => (
                     <Link key={article.id} href={`/news/${article.slug || article.id}`} className="block group">
-                        <div className="relative bg-slate-950 border border-slate-800 p-4 rounded-xl hover:border-sky-500/50 transition-all active:scale-[0.98]">
+                        {/* Уменьшенные отступы (p-3) и размеры шрифтов для мобильных */}
+                        <div className="relative bg-slate-950 border border-slate-800 p-3 lg:p-5 rounded-xl hover:border-sky-500/50 transition-all active:scale-[0.98]">
                             
+                            {/* Категория (супер компактная) */}
                             {article.category && (
-                                <div className="absolute top-3 right-3 text-[9px] font-bold px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400">
+                                <div className="absolute top-3 right-3 text-[8px] lg:text-[10px] font-bold px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400">
                                     {article.category}
                                 </div>
                             )}
 
-                            <h3 className="text-sm font-bold text-white mb-2 pr-8 leading-snug group-hover:text-sky-400">
+                            {/* Заголовок */}
+                            <h3 className="text-sm lg:text-base font-bold text-white mb-1.5 pr-6 leading-snug group-hover:text-sky-400">
                                 {article.title}
                             </h3>
                             
-                            <div className="flex items-center justify-between border-t border-slate-800 pt-2 mt-2">
-                                <span className="text-[10px] text-slate-500 flex items-center gap-1">
-                                    <Calendar size={10} />
+                            {/* Описание (скрываем на совсем мелких экранах, если надо, или ограничиваем 2 строками) */}
+                            {article.excerpt && (
+                                <p className="text-xs text-slate-500 mb-3 line-clamp-2 leading-relaxed">
+                                    {article.excerpt}
+                                </p>
+                            )}
+
+                            {/* Футер карточки */}
+                            <div className="flex items-center justify-between border-t border-slate-800 pt-2 mt-1">
+                                <span className="text-[10px] lg:text-xs text-slate-600 flex items-center gap-1.5">
+                                    <Calendar size={10} className="lg:w-3 lg:h-3" />
                                     {new Date(article.date_created).toLocaleDateString('ru-RU')}
                                 </span>
-                                <ArrowRight size={14} className="text-sky-500 -ml-2 opacity-0 group-hover:opacity-100 group-hover:ml-0 transition-all" />
+                                <ArrowRight size={14} className="text-sky-500 opacity-80" />
                             </div>
                         </div>
                     </Link>
                 ))}
                 
+                {/* Пустое состояние */}
                 {!loading && articles.length === 0 && (
-                    <div className="text-center py-10 px-4 rounded-xl border border-dashed border-slate-800 bg-slate-900/50">
-                        <FileText size={32} className="mx-auto text-slate-700 mb-2" />
-                        <p className="text-slate-400 text-sm">Нет материалов</p>
+                    <div className="text-center py-8 px-4 rounded-xl border border-dashed border-slate-800 bg-slate-900/30">
+                        <FileText size={24} className="mx-auto text-slate-700 mb-2" />
+                        <p className="text-slate-500 text-xs">Нет материалов по этой теме</p>
                     </div>
                 )}
               </div>
