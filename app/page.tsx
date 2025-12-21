@@ -43,7 +43,7 @@ export default function HomePage() {
             <p className="text-xl md:text-2xl text-slate-300 mb-10 max-w-3xl mx-auto font-light leading-relaxed">
               Отсекаем 90% информационного шума. 
               <span className="text-white font-medium block mt-2">
-                Мы отслеживаем патенты, научные статьи и инсайды, пока другие читают новости.
+                Мы отслеживаем патенты, научные статьи и инсайды, пока другие пишут о ценах на нефть.
               </span>
             </p>
           </motion.div>
