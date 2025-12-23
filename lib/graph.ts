@@ -1,11 +1,11 @@
 import { directus } from './directus';
 import { readItems } from '@directus/sdk';
 
-// 1. Обновляем интерфейсы, чтобы поддерживать веса (val, value)
+// 1. Обновляем интерфейсы
 export interface GraphNode {
   id: string;
-  group: number;
-  val: number; // Размер узла
+  group: number; // Номер группы для цвета (0-5)
+  val: number;   // Размер узла
 }
 
 export interface GraphLink {
@@ -14,15 +14,23 @@ export interface GraphLink {
   value: number; // Вес связи (толщина линии)
 }
 
+// Хелпер: Генерирует стабильный номер цвета (0-5) из строки
+function getGroupColor(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash % 6); 
+}
+
 export async function fetchGraphData() {
   try {
     console.log("--> Запрос данных для графа (SDK)...");
     
-    // 2. Используем проверенный метод загрузки (SDK)
-    // Запрашиваем из коллекции 'articles', как в старом коде
+    // 2. Запрашиваем данные из Directus
     const articles = await directus.request(readItems('articles', {
       fields: ['*', 'tags'], 
-      limit: 200 // Увеличил лимит, чтобы граф был интереснее
+      limit: 300 // Лимит статей
     }));
 
     console.log(`--> Загружено статей: ${articles.length}`);
@@ -38,10 +46,10 @@ export async function fetchGraphData() {
     articles.forEach((article) => {
       let tags: string[] = [];
       
-      // Логика из старого кода + небольшая защита от ошибок
+      // Парсинг тегов (поддержка разных форматов Directus)
       if (article.tags) {
         if (Array.isArray(article.tags)) {
-           // Пытаемся достать имя тега из разных структур
+           // @ts-ignore
            tags = article.tags.map((t: any) => 
              typeof t === 'string' ? t : (t.tags_id?.name || t.name || t.tag || null)
            );
@@ -50,22 +58,23 @@ export async function fetchGraphData() {
         }
       } 
       
-      // Фильтруем null и пустые строки
+      // Очистка пустых значений
       tags = tags.filter(t => t && t.length > 0);
 
+      // Если тегов нет, берем категорию
       if (tags.length === 0 && article.category) {
          tags = [article.category];
       }
 
-      // 3. Считаем частоту тегов (для размера шариков)
+      // 3. Считаем частоту тегов (вес узлов)
       tags.forEach(tag => {
         nodesMap.set(tag, (nodesMap.get(tag) || 0) + 1);
       });
 
-      // 4. Считаем связи (для толщины линий)
+      // 4. Считаем связи (вес линков)
       for (let i = 0; i < tags.length; i++) {
         for (let j = i + 1; j < tags.length; j++) {
-          // Сортируем, чтобы связь A-B и B-A считалась одной и той же
+          // Сортируем, чтобы связь A-B и B-A была одной и той же
           const linkId = [tags[i], tags[j]].sort().join('---');
           linksMap.set(linkId, (linksMap.get(linkId) || 0) + 1);
         }
@@ -74,10 +83,11 @@ export async function fetchGraphData() {
 
     // 5. Формируем финальные массивы
 
-    const nodes: GraphNode[] = Array.from(nodesMap.entries()).map(([id, count], index) => ({
+    const nodes: GraphNode[] = Array.from(nodesMap.entries()).map(([id, count]) => ({
       id,
-      group: 1, // Можно вернуть index % 5 для разноцветности, но 1 - безопаснее для начала
-      // Логарифмический размер: чтобы популярные темы не были огромными шарами
+      // ГРУППА ТЕПЕРЬ ЗАВИСИТ ОТ ИМЕНИ (для разных цветов)
+      group: getGroupColor(id), 
+      // Логарифмический размер узла
       val: Math.log2(count + 1) * 3 
     }));
 
@@ -86,7 +96,7 @@ export async function fetchGraphData() {
       return { 
           source, 
           target, 
-          value: weight // <--- САМОЕ ВАЖНОЕ: Передаем вес на фронтенд!
+          value: weight // Толщина линии
       };
     });
 
@@ -95,7 +105,6 @@ export async function fetchGraphData() {
 
   } catch (error: any) {
     console.error("!!! ОШИБКА ПОСТРОЕНИЯ ГРАФА !!!");
-    // Логируем ошибку, но возвращаем пустой граф, чтобы сайт не упал
     if (error?.errors) {
         console.error("Directus Error:", JSON.stringify(error.errors, null, 2));
     } else {

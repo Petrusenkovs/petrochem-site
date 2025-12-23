@@ -10,4 +10,5 @@ export interface NewsArticle {
   category: string;
   tags?: string[] | string; // Теги могут прийти массивом или строкой
   author?: string;
+  published_date?: string
 }

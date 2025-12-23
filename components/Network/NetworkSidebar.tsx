@@ -14,6 +14,7 @@ interface Article {
   title: string;
   slug: string;
   date_created: string;
+  published_date?: string;
   category?: string;
   excerpt?: string;
 }
@@ -47,16 +48,13 @@ export default function NetworkSidebar({ nodeId, onClose }: NetworkSidebarProps)
   }, [nodeId]);
 
   return (
-    // min-h-0 важен для flex-контейнеров
     <div className="w-full h-full flex flex-col bg-slate-900 min-h-0">
       
       {/* --- ШАПКА --- */}
-      {/* Не используем sticky на мобилках, просто ставим блок первым в flex-колонке */}
-      <div className="
-         h-14 lg:h-16 px-4 flex justify-between items-center 
-         bg-slate-900 border-b border-slate-800 shrink-0
-         pt-[env(safe-area-inset-top)] /* Учет челки на iPhone в landscape */
-      ">
+      <div 
+        className="h-14 lg:h-16 px-4 flex justify-between items-center bg-slate-900 border-b border-slate-800 shrink-0"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
         <div className="overflow-hidden flex-1 mr-2">
             <div className="text-[9px] lg:text-[10px] text-sky-500 font-bold uppercase tracking-widest leading-none mb-1">
                 Тема
@@ -74,17 +72,11 @@ export default function NetworkSidebar({ nodeId, onClose }: NetworkSidebarProps)
         </button>
       </div>
 
-      {/* --- СПИСОК (SCROLL AREA) --- */}
-      {/* flex-1: занимает все оставшееся место
-         overflow-y-auto: скроллится только этот блок
-         pb-[env(...)]: отступ снизу для iPhone Home Indicator
-      */}
-      <div className="
-        flex-1 overflow-y-auto min-h-0 
-        p-3 lg:p-5 
-        scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent
-        pb-[env(safe-area-inset-bottom)]
-      ">
+      {/* --- СПИСОК --- */}
+      <div 
+        className="flex-1 overflow-y-auto min-h-0 p-3 lg:p-5 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
         
         {loading ? (
            <div className="flex flex-col items-center justify-center h-full gap-3 opacity-70">
@@ -100,36 +92,44 @@ export default function NetworkSidebar({ nodeId, onClose }: NetworkSidebarProps)
               </div>
 
               <div className="space-y-3 pb-8">
-                {articles.map((article) => (
-                    <Link key={article.id} href={`/news/${article.slug || article.id}`} className="block group">
-                        <div className="relative bg-slate-950 border border-slate-800 p-3 lg:p-5 rounded-xl active:scale-[0.98] transition-all">
-                            
-                            {article.category && (
-                                <div className="absolute top-3 right-3 text-[8px] lg:text-[10px] font-bold px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400">
-                                    {article.category}
+                {articles.map((article) => {
+                    const displayDate = article.published_date || article.date_created;
+
+                    return (
+                        <Link key={article.id} href={`/news/${article.slug || article.id}`} className="block group">
+                            <div className="relative bg-slate-950 border border-slate-800 p-3 lg:p-5 rounded-xl active:scale-[0.98] transition-all">
+                                
+                                {article.category && (
+                                    <div className="absolute top-3 right-3 text-[8px] lg:text-[10px] font-bold px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400">
+                                        {article.category}
+                                    </div>
+                                )}
+
+                                <h3 className="text-sm lg:text-base font-bold text-white mb-1.5 pr-6 leading-snug">
+                                    {article.title}
+                                </h3>
+                                
+                                {article.excerpt && (
+                                    <p className="text-xs text-slate-500 mb-3 line-clamp-2 leading-relaxed">
+                                        {article.excerpt}
+                                    </p>
+                                )}
+
+                                <div className="flex items-center justify-between border-t border-slate-800 pt-2 mt-1">
+                                    <span className="text-[10px] lg:text-xs text-slate-600 flex items-center gap-1.5">
+                                        <Calendar size={10} />
+                                        {new Date(displayDate).toLocaleDateString('ru-RU', {
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric'
+                                        })}
+                                    </span>
+                                    <ArrowRight size={14} className="text-sky-500 opacity-80" />
                                 </div>
-                            )}
-
-                            <h3 className="text-sm lg:text-base font-bold text-white mb-1.5 pr-6 leading-snug">
-                                {article.title}
-                            </h3>
-                            
-                            {article.excerpt && (
-                                <p className="text-xs text-slate-500 mb-3 line-clamp-2 leading-relaxed">
-                                    {article.excerpt}
-                                </p>
-                            )}
-
-                            <div className="flex items-center justify-between border-t border-slate-800 pt-2 mt-1">
-                                <span className="text-[10px] lg:text-xs text-slate-600 flex items-center gap-1.5">
-                                    <Calendar size={10} />
-                                    {new Date(article.date_created).toLocaleDateString('ru-RU')}
-                                </span>
-                                <ArrowRight size={14} className="text-sky-500 opacity-80" />
                             </div>
-                        </div>
-                    </Link>
-                ))}
+                        </Link>
+                    );
+                })}
                 
                 {!loading && articles.length === 0 && (
                     <div className="text-center py-8 px-4 rounded-xl border border-dashed border-slate-800 bg-slate-900/30">
