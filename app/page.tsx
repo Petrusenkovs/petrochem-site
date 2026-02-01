@@ -21,7 +21,7 @@ export default function HomePage() {
       ========================================= */}
       <section className="min-h-[90vh] flex items-center justify-center px-4 relative">
         {/* Фоновое свечение */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-600/20 rounded-full blur-[120px] -z-10 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-sky-600/20 rounded-full blur-[120px] -z-10 pointer-events-none" />
 
         <div className="max-w-6xl mx-auto text-center">
           <motion.div
@@ -35,7 +35,7 @@ export default function HomePage() {
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-8 leading-tight text-white">
               Мониторим всё инфополе,<br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-400 via-purple-400 to-sky-400">
+              <span className="bg-clip-text text-transparent bg-linear-to-r from-sky-400 via-purple-400 to-sky-400">
                 чтобы вы получили суть
               </span>
             </h1>
@@ -106,7 +106,7 @@ export default function HomePage() {
               
               <div className="flex items-center gap-3 mb-8">
                 <CheckCircle2 className="w-10 h-10 text-emerald-400" />
-                <h3 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-white">
+                <h3 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-sky-400 to-white">
                   ЧИСТЫЙ СИГНАЛ
                 </h3>
               </div>
@@ -162,7 +162,7 @@ export default function HomePage() {
       {/* =========================================
           3. ЖИЗНЕННЫЙ ЦИКЛ (TIMELINE)
       ========================================= */}
-      <section className="py-24 bg-gradient-to-b from-transparent to-slate-900/50 border-y border-white/5">
+      <section className="py-24 bg-linear-to-b from-transparent to-slate-900/50 border-y border-white/5">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-16">
              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Жизненный Цикл Технологии</h2>
@@ -179,7 +179,7 @@ export default function HomePage() {
              </div>
 
              <div className="relative">
-                <div className="hidden md:block absolute top-12 left-0 w-full h-1 bg-gradient-to-r from-sky-900 via-sky-500 to-emerald-500 rounded-full opacity-30" />
+                <div className="hidden md:block absolute top-12 left-0 w-full h-1 bg-linear-to-r from-sky-900 via-sky-500 to-emerald-500 rounded-full opacity-30" />
                 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                    
@@ -237,7 +237,7 @@ export default function HomePage() {
           4. ЭКСПЕРТЫ (RADAR)
       ========================================= */}
       <section className="py-24 px-4 relative overflow-hidden">
-        <div className="absolute right-0 top-1/2 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px] -z-10" />
+        <div className="absolute right-0 top-1/2 w-125 h-125 bg-purple-600/10 rounded-full blur-[100px] -z-10" />
 
         <div className="max-w-7xl mx-auto">
            <div className="mb-16">
@@ -249,7 +249,7 @@ export default function HomePage() {
               
               <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-6 hover:border-sky-500/50 transition-colors group">
                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-sky-400 to-purple-500 p-[2px]">
+                    <div className="w-16 h-16 rounded-full bg-linear-to-tr from-sky-400 to-purple-500 p-0.5">
                        <div className="w-full h-full bg-slate-900 rounded-full flex items-center justify-center overflow-hidden">
                           <Users className="text-white w-8 h-8" />
                        </div>
@@ -273,7 +273,7 @@ export default function HomePage() {
 
               <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-6 hover:border-emerald-500/50 transition-colors group">
                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-400 to-teal-500 p-[2px]">
+                    <div className="w-16 h-16 rounded-full bg-linear-to-tr from-emerald-400 to-teal-500 p-0.5">
                        <div className="w-full h-full bg-slate-900 rounded-full flex items-center justify-center overflow-hidden">
                           <Users className="text-white w-8 h-8" />
                        </div>
@@ -293,7 +293,7 @@ export default function HomePage() {
 
               <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-6 hover:border-orange-500/50 transition-colors group">
                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-red-400 to-orange-500 p-[2px]">
+                    <div className="w-16 h-16 rounded-full bg-linear-to-tr from-red-400 to-orange-500 p-0.5">
                        <div className="w-full h-full bg-slate-900 rounded-full flex items-center justify-center overflow-hidden">
                           <Users className="text-white w-8 h-8" />
                        </div>
@@ -352,7 +352,7 @@ export default function HomePage() {
               </div>
 
               {/* Контент Табов */}
-              <div className="p-8 md:p-12 min-h-[400px]">
+              <div className="p-8 md:p-12 min-h-100">
                  <AnimatePresence mode="wait">
                     
                     {/* R&D TAB */}
@@ -463,7 +463,7 @@ export default function HomePage() {
           6. CTA (ФИНАЛ)
       ========================================= */}
       <section className="py-24 px-4 text-center">
-        <div className="max-w-4xl mx-auto bg-gradient-to-br from-slate-900 to-slate-800 border border-white/10 rounded-3xl p-12 shadow-2xl relative overflow-hidden">
+        <div className="max-w-4xl mx-auto bg-linear-to-br from-slate-900 to-slate-800 border border-white/10 rounded-3xl p-12 shadow-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-sky-500/5" />
           
           <h2 className="text-4xl font-bold text-white mb-6 relative z-10">Доступ к системе</h2>

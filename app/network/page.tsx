@@ -1,11 +1,11 @@
-import { fetchGraphData, GraphNode, GraphLink } from '@/lib/graph';
+import { fetchGraphData, GraphData } from '@/lib/graph';
 import NetworkLayout from '@/components/Network/NetworkLayout';
 
-export const revalidate = 3600;
+// Обновление каждые 10 минут (вместо 1 часа)
+export const revalidate = 600;
 
 export default async function NetworkPage() {
-  // ИСПРАВЛЕНИЕ: Явно указываем типы, чтобы TS не думал, что массивы вечно пустые
-  let data: { nodes: GraphNode[]; links: GraphLink[] } = { nodes: [], links: [] };
+  let data: GraphData = { nodes: [], links: [], articles: [] };
 
   try {
     const fetchedData = await fetchGraphData();
